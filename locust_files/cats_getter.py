@@ -24,6 +24,5 @@ class CatsGetter(SequentialTaskSet):
 
 class HomeFun(HttpUser):
     host = 'https://http.cat'
-
     tasks = [CatsGetter]
     wait_time = between(2,5)
