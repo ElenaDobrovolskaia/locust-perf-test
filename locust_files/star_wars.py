@@ -1,14 +1,14 @@
 from unittest import result
 from urllib import response
 
-from locust import HttpUser, TaskSet, constant, task
+from locust import HttpUser, TaskSet, constant, task, tag
 
 
 class StarWarsExplorer(HttpUser):
     host = 'https://swapi.info/api'
     wait_time = constant(1)
 
-    def on_start(self) -> None:
+    def on_start(self):
         print("Starting StarWars Explorer")
 
     @task
@@ -17,6 +17,7 @@ class StarWarsExplorer(HttpUser):
 
 
     @task
+    @tag('smoke')
     def get_films(self):
         expected_film="Attack of the Clones"
         with self.client.get("/films", catch_response=True, name="Get films list") as response:
