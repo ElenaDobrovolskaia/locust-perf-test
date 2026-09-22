@@ -36,7 +36,7 @@ class PetStore(SequentialTaskSet):
                    break
 
             try:
-                jsession =re.search(r"jsessionid=(.+?)\?", response.text)
+                jsession =re.search(r"jsessionid=([A-F0-9]{32})", response.text)
                 self.jsession=jsession.group(1)
             except AttributeError:
                 self.jsession=""
@@ -46,7 +46,7 @@ class PetStore(SequentialTaskSet):
         self.client.cookies.clear()
         url = self.url_core + ";jsessionid=" + self.jsession + "?signonForm="
         with self.client.get(url, catch_response=True, name="TC3 - SignOn Page") as response:
-            if "Please enter our username and password." in response.text:
+            if "Please enter your username and password." in response.text:
                 response.success()
             else:
                 response.failure("SignIn page check failed")
@@ -57,13 +57,14 @@ class PetStore(SequentialTaskSet):
     def login(self):
         self.client.cookies.clear()
         data={
-            "username":"Fluffy Puff",
+            "username":"FluffyPuff",
             "password":"Cat4Me",
-            "signon":"login"
+            "signon":"Login"
         }
 
-        with self.client.get(self.url_core, catch_response=True, name="TC4 - SignIn Page") as response:
-             if "Welcome to ABC!" in response.text:
+        with self.client.post(self.url_core, catch_response=True, data=data, name="TC4 - SignIn Page") as response:
+             print(response.text)
+             if "Welcome Pink Fluffy!" in response.text:
                 response.success()
                 try:
                     random_pet=re.findall(r"Catalog.action\?viewCategory=&categoryId=(.+?)\"", response.text)
@@ -76,7 +77,7 @@ class PetStore(SequentialTaskSet):
     @task
     def random_pet(self):
         url = "/actions/Catalog.action?viewCategory=&categoryID=" + self.random_pet
-        name="TC5_" + self.random_pet + " Page"
+        name="TC5 - " + self.random_pet + " Page"
         with self.client.get(url, catch_response=True, name=name) as response:
             if self.random_pet in response.text:
                 response.success()
