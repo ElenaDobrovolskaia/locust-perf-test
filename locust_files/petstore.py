@@ -1,6 +1,5 @@
-from http import cookies
+import logging
 
-from geventhttpclient import url
 from locust import HttpUser, SequentialTaskSet, task, constant
 import re
 import random
@@ -63,9 +62,9 @@ class PetStore(SequentialTaskSet):
         }
 
         with self.client.post(self.url_core, catch_response=True, data=data, name="TC4 - SignIn Page") as response:
-             print(response.text)
              if "Welcome Pink Fluffy!" in response.text:
                 response.success()
+                logging.info("User logged in successfully")
                 try:
                     random_pet=re.findall(r"Catalog.action\?viewCategory=&categoryId=(.+?)\"", response.text)
                     self.random_pet=random.choice(random_pet)
@@ -73,6 +72,7 @@ class PetStore(SequentialTaskSet):
                     self.random_pet=""
              else:
                 response.failure("SignIn failed")
+                logging.info("User unable to login")
 
     @task
     def random_pet(self):
